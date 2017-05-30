@@ -1,0 +1,559 @@
+%% abntex2UFSC.sty, v-1 guizsantos
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `unmaintained'.
+%% 
+%% The Current Maintainer of this work is the Guilherme Z. Santos
+%%
+%% This work consists of the file abntex2UFSC.sty.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{abntex2UFSC}[2017/03/01 abnTeX2 to UFSC]
+
+\DeclareOption{a5paper}{%
+\setlrmarginsandblock{2.5cm}{1.5cm}{*}
+\setulmarginsandblock{2cm}{1.5cm}{*}
+\setlength{\headheight}{12.5pt}
+\checkandfixthelayout
+}
+
+\DeclareOption{10.5pt}{%
+\renewcommand\normalsize{%
+	\@setfontsize\normalsize{10.5}{12.5}}
+\renewcommand\small{%
+	\@setfontsize\small{9.5}{11.5}}
+\renewcommand\footnotesize{%
+	\@setfontsize\small{8}{10}}
+}
+
+\ProcessOptions\relax
+
+\RequirePackage{iftex}%
+\ifPDFTeX%
+	\usepackage[utf8]{inputenc}%
+	\usepackage[T1]{fontenc}
+\else%
+	\usepackage{fontspec}%
+\fi%
+
+\settypeoutlayoutunit{cm}
+\typeoutlayout
+
+\RequirePackage{pgfkeys,pdfpages,varwidth,fix-cm,tikz,xcolor,indentfirst}
+
+%-DEFINIÇÃO DE ALGUNS NOMES E SUAS TRADUÇÕES PARA O INGLÊS
+\renewcommand{\orientadorname}{Orientador}
+\renewcommand{\coorientadorname}{Coorientador}
+\newcommand{\examinationbenchname}{Banca examinadora:}
+\newcommand{\listofacronymsandsymbolsname}{Lista de siglas e símbolos}
+\newcommand{\listofromansymbolsname}{Símbolos romanos}
+\newcommand{\listofgreeksymbolsname}{Símbolos gregos}
+\newcommand{\listofacronymsname}{Siglas}
+\addto\captionsenglish{%
+	\renewcommand{\orientadorname}{Supervisor}
+	\renewcommand{\coorientadorname}{Co-supervisor}
+	\renewcommand{\examinationbenchname}{Examination bench:}
+	\renewcommand{\listofacronymsandsymbolsname}{List of acronyms and symbols}
+	\renewcommand{\listofromansymbolsname}{Roman symbols}
+	\renewcommand{\listofgreeksymbolsname}{Greek symbols}
+	\renewcommand{\listofacronymsname}{Acronyms}
+}
+
+%-REDEFINIÇÕES DA CLASSE abntex2
+\RequirePackage{booktabs}
+\renewcommand{\ABNTEXsign}[1]{%
+	\begin{tabular}[t]{>{\centering\small}m{\ABNTEXsignwidth}}
+		\\[\ABNTEXsignskip]\midrule[\ABNTEXsignthickness]
+		#1\\
+	\end{tabular}
+}
+
+\ifthenelse{\boolean{ABNTEXsumario-abnt-6027-2012}}{%
+\renewcommand{\bibsection}{%
+	\chapter*{\bibname}
+	\bibmark
+	\ifnobibintoc\else
+	\phantomsection
+	\addcontentsline{toc}{chapter}{\texorpdfstring{\uppercase{\bibname}}{\bibname}}
+	\fi
+	\prebibhook}
+}{}
+
+\renewcommand{\PRIVATEapendiceconfig}[2]{%
+	\setboolean{abntex@apendiceousecao}{true}%
+	\renewcommand{\appendixname}{#1}
+	\ifthenelse{\boolean{ABNTEXsumario-abnt-6027-2012}}{
+		\renewcommand{\appendixtocname}{\texorpdfstring{\uppercase{#2}}{#2}}
+	}{%
+		\renewcommand{\appendixtocname}{#2}} 
+	\renewcommand{\appendixpagename}{#2}
+	\switchchapname{#1}% Corrected from \switchapname -> \switchchapname
+	\renewcommand*{\cftappendixname}{#1 \space}
+}
+
+\setlength{\afterchapskip}{2\lineskip}
+\setlength{\subfloatcapskip}{.5em}
+\setlength{\subfloatcaptopadj}{0pt}
+\addto\textual{\setcounter{table}{0}}
+
+%-CRIA O COMANDO PARA CONFIGURAR O TEMPLATE
+\newcommand{\setUFSCtemplate}[1]{\pgfkeys{/UFSC/.cd,#1}}
+
+\def\imprimirlistas{}
+\def\imprimirfichacatalografica{%
+	\begin{center}
+		\LARGE Fazer a ficha no site
+		
+		\url{http://ficha.bu.ufsc.br/}
+		
+		E incluir o PDF via \texttt{\textbackslash setUFSCtemplate\{ficha catalografica=<file>\}}
+	\end{center}
+	\clearpage
+}
+
+%--DEFINIÇÃO DAS CHAVES PARA CONFIGURAR O FORMATO
+\setUFSCtemplate{%
+	uppercased chapters/.code={\setboolean{ABNTEXupperchapter}{true}}
+	,uppercased sections/.code={%
+		\setboolean{ABNTEXuppersection}{true}%
+		\let\oldcontentsline\contentsline
+		\def\contentsline##1##2{%
+			\expandafter\ifx\csname l@##1\endcsname\l@section%
+			\expandafter\@firstoftwo%
+			\else%
+			\expandafter\@secondoftwo%
+			\fi%
+			{\oldcontentsline{##1}{\MakeTextUppercase{##2}}%
+			}{\oldcontentsline{##1}{##2}}}%
+		}
+	,uppercased subsections/.code={\setboolean{ABNTEXuppersubsection}{true}}
+	,uppercased subsubsections/.code={\setboolean{ABNTEXuppersubsubsection}{true}}
+	,uppercased subsubsubsections/.code={\setboolean{ABNTEXuppersubsubsubsection}{true}}
+	,part font/.code={\def\ABNTEXpartfont{#1}}
+	,chapter font/.code={\def\ABNTEXchapterfont{#1}}
+	,section font/.code={\def\ABNTEXsectionfont{#1}\def\cftsectionfont{#1}}
+	,subsection font/.code={\def\ABNTEXsubsectionfont{#1}\def\cftsubsectionfont{#1}}
+	,subsubsection font/.code={\def\ABNTEXsubsubsectionfont{#1}\def\cftsubsubsectionfont{#1}}
+	,subsubsubsection font/.code={\def\ABNTEXsubsubsubsectionfont{#1}\def\cftparagraphfont{#1}}
+	,part font size/.code={\def\ABNTEXpartfontsize{#1}}
+	,chapter font size/.code={\def\ABNTEXchapterfontsize{#1}}
+	,section font size/.code={\def\ABNTEXsectionfontsize{#1}}
+	,subsection font size/.code={\def\ABNTEXsubsectionfontsize{#1}}
+	,subsubsection font size/.code={\def\ABNTEXsubsubsectionfontsize{#1}}
+	,subsubsubsection font size/.code={\def\ABNTEXsubsubsubsectionfontsize{#1}}
+	,titles font size/.style={part font size=#1, chapter font size=#1, section font size=#1, subsection font size=#1, subsubsection font size=#1, subsubsubsection font size=#1}
+}
+
+%--DEFINIÇÃO DAS CHAVES PARA INFORMAÇÕES DA GERAÇÃO AUTOMÁTICA DE CAPA E OUTROS
+\newboolean{tcc}\setboolean{tcc}{false}
+\def\imprimircoordenador{}
+\setUFSCtemplate{%
+	author/.code={\author{#1}\hypersetup{pdfauthor={#1}}}
+	,title/.code={\title{#1}\hypersetup{pdftitle={#1}}}
+	,subtitle/.code={\def\imprimirsubtitulo{#1}}
+	,subtitle=\pgfutil@empty
+	,date/.code={\date{#1}}
+	,local/.code={\local{#1}}
+	,instituition/.code={\instituicao{#1}}
+	,instituition={Universidade Federal de Santa Catarina}
+	,advisor/.code={\orientador{#1}}
+	,co-advisor/.code={\coorientador{#1}}
+	,coordinator/.code={\def\imprimircoordenador{#1}}
+	,nature of work/.code={\pgfkeysalso{nature of work/.cd,#1,/UFSC/.cd, nature of work text={\typeofwork@UFSC\space\ifthenelse{\boolean{tcc}}{apresentado ao}{apresentada ao}\space\course@UFSC\space da Universidade Federal de Santa Catarina como parte dos requisitos para obtenção do título de\space\giventitle@UFSC.}}}
+	,approval sheet text/.store in=\approvalsheet@UFSC
+	,approval sheet text={none}
+	,bench1/.code={\def\benchone@UFSC{\assinatura{#1}}}
+	,bench2/.code={\def\benchtwo@UFSC{\assinatura{#1}}}
+	,bench3/.code={\def\benchthree@UFSC{\assinatura{#1}}}
+	,bench4/.code={\def\benchfour@UFSC{\assinatura{#1}}}
+	,nature of work text/.code={\preambulo{#1}}
+	,nature of work/.cd%
+		,type/.is choice
+			,type/tcc/.code={%
+				\definecolor{background color}{cmyk}{0,1,1,0}%
+				\def\typeofwork@UFSC{Trabalho de Conclusão de Curso}%
+				\setboolean{tcc}{true}%
+				\let\upperbar@hardcover@UFSC\typeofwork@UFSC%
+			}
+			,type/monography/.code={%
+				\definecolor{background color}{cmyk}{0,.07,1,0}%
+				\setboolean{tcc}{false}%
+				\def\upperbar@hardcover@UFSC{Monografia de Pós-Graduação}%
+			}
+			,type/masters dissertation/.code={%
+				\definecolor{background color}{cmyk}{1,0,1,0}
+				\def\typeofwork@UFSC{Dissertação de Mestrado}%
+				\setboolean{tcc}{false}%
+				\let\upperbar@hardcover@UFSC\typeofwork@UFSC%
+			}
+			,type/doctoral thesis/.code={%
+				\definecolor{background color}{cmyk}{1,.69,0,0}%
+				\def\typeofwork@UFSC{Tese de Doutorado}%
+				\setboolean{tcc}{false}%
+				\let\upperbar@hardcover@UFSC\typeofwork@UFSC%
+			}
+			,type/post-doc report/.code={%
+				\definecolor{background color}{cmyk}{0,0,0,.6}%
+				\setboolean{tcc}{false}%
+				\def\upperbar@hardcover@UFSC{Relatório de Pós-doutorado}%
+			}
+		,course/.store in=\course@UFSC%
+		,given title/.store in=\giventitle@UFSC
+}
+
+\hypersetup{
+	pdfencoding=auto
+	,pdfcreator={\LaTeX}
+	,colorlinks=true       		% false: boxed links; true: colored links
+	,linkcolor=black          	% color of internal links
+	,citecolor=black        	% color of links to bibliography
+	,filecolor=black      		% color of file links
+	,urlcolor=black
+	,bookmarksdepth={4}
+}
+
+%--DEFINIÇÕES PARA GERAÇÃO AUTOMÁTICA DE CAPA E OUTROS
+\setUFSCtemplate{%
+	cover page code/.code={%
+		\renewcommand{\imprimircapa}{#1}
+	}
+	,cover page code={% Capa
+		\hypersetup{pageanchor=false}
+		\begin{capa}%
+			\center
+			{
+%				\abntex@ifnotempty{\imprimirinstituicao}{\ABNTEXsectionfontsize\ABNTEXsectionfont\MakeTextUppercase{\imprimirinstituicao}\par}
+				\imprimirautor
+			}
+			
+			\vfill
+			\begin{center}
+			\ABNTEXchapterfontsize\ABNTEXchapterfont\MakeTextUppercase{\imprimirtitulo}\abntex@ifnotempty{\imprimirsubtitulo}{:\space\MakeTextUppercase\imprimirsubtitulo}
+			\end{center}
+			\vfill
+			
+			\ABNTEXsectionfontsize\imprimirlocal
+			
+			\imprimirdata
+			
+			\vspace*{1cm}
+		\end{capa}
+		\hypersetup{pageanchor=true}
+	}
+	,title page code/.code={%
+		\def\imprimirfolhaderosto{#1}%
+	}
+	,title page code={% Folha de rosto
+		\begin{center}
+			{\ABNTEXsectionfontsize\ABNTEXchapterfont\imprimirautor}
+			
+			\vspace*{\fill}
+			{\ABNTEXchapterfontsize\ABNTEXchapterfont\MakeTextUppercase{\imprimirtitulo}\abntex@ifnotempty{\imprimirsubtitulo}{:\space\MakeTextUppercase\imprimirsubtitulo}}
+			\vspace*{\fill}
+			
+				\hspace{\fill}
+				\begin{minipage}{.6\textwidth}
+					\SingleSpacing\small
+					\imprimirpreambulo
+					
+					\imprimirorientadorRotulo:\space\imprimirorientador
+					
+					\abntex@ifnotempty{\imprimircoorientador}{%
+						{\imprimircoorientadorRotulo:\space\imprimircoorientador}%
+					}%
+				\end{minipage}%
+			\vspace*{\fill}
+			
+			{\ABNTEXsectionfontsize\imprimirlocal
+			\par
+			\large\imprimirdata}
+			\vspace*{1cm}
+		\end{center}
+		\clearpage
+	}
+	,catalogue record/.code={\usepackage{pdfpages}\def\imprimirfichacatalografica{\includepdf{#1}}}
+	,sign line width/.code={\setlength{\ABNTEXsignwidth}{#1}}
+	,sign line width=6cm%
+	,approval sheet code/.code={\def\imprimirfolhadeaprovacao{#1}}
+	,approval sheet code={%
+		\begin{folhadeaprovacao}
+			\begin{center}
+				{\ABNTEXsectionfont\imprimirautor}
+				\vspace*{\fill}
+				
+				{\ABNTEXchapterfont\ABNTEXchapterfontsize\MakeTextUppercase{\imprimirtitulo}\abntex@ifnotempty{\imprimirsubtitulo}{:\space\MakeTextUppercase\imprimirsubtitulo}}
+			\vfill
+		
+			\ifthenelse{\equal{\approvalsheet@UFSC}{none}}{%
+				\parbox{\textwidth}{\noindent\ifthenelse{\boolean{tcc}}{Este}{Esta}\space\typeofwork@UFSC\space foi\space\ifthenelse{\boolean{tcc}}{julgado adequado}{julgada adequada}\space para a obtenção do Título de \giventitle@UFSC, e\space\ifthenelse{\boolean{tcc}}{aprovado}{aprovada}\space em sua forma final pelo\space\course@UFSC\space da Universidade Federal de Santa Catarina.}}%
+				{\parbox{\textwidth}{\noindent\approvalsheet@UFSC}}
+			
+				\imprimirlocal, \imprimirdata.
+				
+				\assinatura*{\imprimircoordenador\\Coordenador do curso}\hfill%
+				\ifthenelse{\boolean{tcc}}{\assinatura*{\imprimirprofessor\\Professor da disciplina}}{\assinatura*{\imprimirorientador\\\imprimirorientadorRotulo\\Presidente da banca}}
+				
+			\textbf{\examinationbenchname}\hspace*{\fill}
+			
+				\ifdefined\benchone@UFSC\benchone@UFSC\else\fi
+				\ifdefined\benchtwo@UFSC\benchtwo@UFSC\else\fi
+				\ifdefined\benchthree@UFSC\benchthree@UFSC\else\fi
+				\ifdefined\benchfour@UFSC\benchfour@UFSC\else\fi
+			\end{center}
+			\vfill
+		\end{folhadeaprovacao}
+	}
+	,dedication font/.store in=\dedicationfont@UFSC
+	,dedication font=\itshape
+	,dedication/.code={\def\imprimirdedicatoria{%
+		\begin{dedicatoria}
+			\vspace*{\fill}
+			\hfill
+			\begin{varwidth}{.5\textwidth}
+				\dedicationfont@UFSC #1
+			\end{varwidth}
+		\end{dedicatoria}
+		}
+	}	
+	,epigraph font/.store in=\epigrafefont@UFSC
+	,epigraph font=\itshape
+	,epigraph/.code 2 args={\def\imprimirepigrafe{%
+		\begin{epigrafe}
+			\vspace*{\fill}
+			\hfill
+			\begin{minipage}{\textwidth-4cm}
+				\begingroup\epigrafefont@UFSC ``#1'' \endgroup
+				
+				\hfill (#2)
+			\end{minipage}
+		\end{epigrafe}
+		}
+	}
+}
+
+%-SUPORTE PARA A LISTA DE SIGLAS
+\RequirePackage{afterpackage,calc}
+\AfterPackage{glossaries}{%
+	\newglossary[slg]{romansymbol}{sri}{srg}{\listofromansymbolsname} % create add. romansymbol
+	\newglossary[slg]{greeksymbol}{sgi}{sgg}{\listofgreeksymbolsname} % create add. greeksymbol
+	\glsaddkey*{unit}{}{\glsentryunit}{\Glsentryunit}{\glsunit}{\Glsunit}{\GLSunit}
+	\newglossarystyle{siglas}{%
+		\setglossarystyle{long}%
+		\renewenvironment{theglossary}%
+		{\begin{longtable}{>{\bfseries}lp{.8\textwidth}}}% <-- change the value here
+		{\end{longtable}}%
+	}
+	\newglossarystyle{simbolos}{%
+		\setglossarystyle{long3col}% base this style on the list style
+		\renewenvironment{theglossary}% Change the table type --> 3 columns
+		{\begin{longtable}{cp{.6\textwidth}c}}%
+		{\end{longtable}}%
+		\renewcommand*{\glossaryheader}{%  Change the table header
+			\bfseries Símbolo & \bfseries Descrição & \bfseries Unidade \\[.2em]
+			\endhead}%
+		\renewcommand*{\glossentry}[2]{%  Change the displayed items
+			\glstarget{##1}{\glossentryname{##1}} & \glossentrydesc{##1} & \glsunit{##1}  \\}
+	}
+	\glssetnoexpandfield{unit}
+	\makeglossaries
+}
+\setUFSCtemplate{use glossaries/.code={%
+		\let\printglossary\relax
+		\let\theglossary\relax
+		\let\endtheglossary\relax
+		\let\su@ExpandTwoArgs\relax 
+		\let\IfSubStringInString\relax 
+		\let\su@IfSubStringInString\relax
+		\usepackage{longtable,siunitx}
+		\newcommand*{\indentglossarylists}{0}
+		\newcommand{\imprimirlistadesiglasesimbolos}{%
+			\renewcommand*{\indentglossarylists}{1}
+			\pdfbookmark[0]{\listofacronymsandsymbolsname}{las}
+			\imprimirlistadesiglas\PRIVATEclearpageifneeded%
+			\imprimirlistadesimbolosromanos\PRIVATEclearpageifneeded%
+			\imprimirlistadesimbolosgregos\PRIVATEclearpageifneeded%
+		}
+		\newcommand{\imprimirlistadesiglas}{%
+			\pdfbookmark[\indentglossarylists]{\listofacronymsname}{acr}%
+			\printglossary[style=siglas,type=\acronymtype,title=\listofacronymsname]%
+		}
+		\newcommand{\imprimirlistadesimbolosgregos}{%
+			\pdfbookmark[\indentglossarylists]{\listofgreeksymbolsname}{sgg}%
+			\printglossary[style=simbolos,type=greeksymbol,title=\listofgreeksymbolsname]%
+		}
+		\newcommand{\imprimirlistadesimbolosromanos}{%
+			\pdfbookmark[\indentglossarylists]{\listofromansymbolsname}{srg}%
+			\printglossary[style=simbolos,type=romansymbol,title=\listofromansymbolsname]%
+		}
+	}
+	,use nomencl/.code={%
+		\usepackage{siunitx}
+		\AfterPackage{nomencl}{%
+		\newcommand{\insertnomheaders}{\item[\bfseries Símbolo]%
+				{\bfseries Descrição \hfill Unidade}}
+		\renewcommand\nomgroup[1]{%
+			\item[\Large\scshape\ifthenelse{\equal{##1}{A}}{Siglas}{%                A - Acronyms
+				\ifthenelse{\equal{##1}{R}}{Símbolos romanos}{%           R - Roman
+					\ifthenelse{\equal{##1}{G}}{Símbolos gregos}{%           G - Greek
+						\ifthenelse{\equal{##1}{S}}{Sobrescritos}{%            S - Superscripts
+							\ifthenelse{\equal{##1}{U}}{Sub-escritos}{%              U - Subscripts
+								\ifthenelse{\equal{##1}{X}}{Outros}{%           X - Other Symbols
+									{}}}}}}}]\ifthenelse{\equal{##1}{A}}{}{\insertnomheaders}}
+%			\renewcommand*{\nompreamble}{\markboth{\nomname}{\nomname}}
+			\newcommand{\nomunit}[1]{%
+				\renewcommand{\nomentryend}{\hfill \parbox{.15\textwidth}{\hfil ##1\hfil}}%
+			}
+			\setlength{\nomlabelwidth}{.15\textwidth}
+			\newcommand{\nomdescr}[1]{\parbox[t]{.67\textwidth}{##1}}
+			\newcommand{\newacronym}[2]{\nomenclature[A]{##1}{##2}}
+			\newcommand{\newromansymbol}[3][]{\nomenclature[R]{##2}{\nomdescr{##3}\nomunit{##1}}}
+			\newcommand{\newgreeksymbol}[3][]{\nomenclature[G]{##2}{\nomdescr{##3}\nomunit{##1}}}
+			\newcommand{\newsuperscript}[2]{\nomenclature[S]{##1}{##2}}
+			\newcommand{\newsubscript}[2]{\nomenclature[U]{##1}{##2}}
+			\newcommand{\newother}[2]{\nomenclature[X]{##1}{##2}}
+			\renewcommand{\nomname}{\listofacronymsandsymbolsname}
+			\makenomenclature
+		}
+		\newcommand{\imprimirlistadesiglasesimbolos}{%
+			\pdfbookmark[0]{\listofacronymsandsymbolsname}{las}
+			\printnomenclature\cleardoublepage
+		}
+	}
+}
+
+%-DEFAULTS DA BU-UFSC
+\setUFSCtemplate{%
+	uppercased chapters,
+	uppercased sections,
+	titles font size=\normalsize,
+	part font=\normalfont\bfseries,
+	chapter font=\normalfont\bfseries,
+	section font=\normalfont,
+	subsection font=\normalfont\bfseries,
+	subsubsection font=\normalfont,
+	subsubsubsection font=\normalfont\itshape,
+}
+
+%-MODIFICA ALGUMAS DEFINIÇÕES DOS FLOATS (ferramentas do memoir)
+\newsubfloat{figure}		%define os comandos de subfiguras
+\newcommand{\subfigureautorefname}{\figureautorefname}		%define o nome Figura para as subfiguras do comando autoref
+\let\oldsubcaptionref\subcaptionref
+\def\thesubfigure{\alph{subfigure}}		%retira os parenteses do \ref (ao inves de '1(a)' fica '1a')
+\def\@thesubfigure{(\alph{subfigure})%									
+	\if@tightsubcap\hskip\subfloatlabelskip\else\space\fi
+}
+\renewcommand{\subcaptionref}[1]{(\oldsubcaptionref{#1})}
+
+\newcommand*{\ABNTEXlegendfontsize}{\small}
+\renewcommand{\legend}[1]{%		%deixa o tamanho da fonte da legenda pequeno
+	\M@gettitle{#1}%
+	\memlegendinfo{#1}%
+	\par
+	\begingroup
+	\@parboxrestore
+	\if@minipage
+	\@setminipage
+	\fi
+	\normalsize
+	\captiondelim{\mbox{}}
+	\@makecaption{}{\ignorespaces\ABNTEXlegendfontsize #1}\par
+	\endgroup
+}
+
+%-DEFINIÇÕES PARA GERAR A CAPA DURA
+\RequirePackage{tikz,xcolor,geometry}
+\usetikzlibrary{positioning,calc}
+
+\setUFSCtemplate{hard cover/.code={\pgfkeysalso{hard cover setup/.cd,#1,/UFSC/.cd}}
+	,hard cover setup/.cd
+		,cover text/.store in=\title@hardcover@UFSC
+		,cover text={\imprimirtitulo\\[0.5cm]\imprimirautor}
+		,counter cover text/.store in=\countertitle@hardcover@UFSC
+		,counter cover text={\imprimirpreambulo\\[2\baselineskip]\imprimirorientadorRotulo:~\imprimirorientador}
+		,cover flap text/.store in=\titleflap@hardcover@UFSC
+		,counter cover flap text/.store in=\countertitleflap@hardcover@UFSC
+		,lower bar text/.store in=\lowerbar@hardcover@UFSC
+		,X/.store in=\lombada@UFSC
+		,X=0.075
+}
+\newlength{\hardcoverwidth}\newlength{\X@UFSC}
+\newcommand{\imprimircapadura}{%
+	\clearpage
+	\pgfmathparse{\thelastpage*\lombada@UFSC}
+	\setlength{\X@UFSC}{\pgfmathresult mm}
+	\setlength{\hardcoverwidth}{4.5cm+14.8cm+\X@UFSC+15cm+5cm}
+	\eject \pdfpagewidth=\hardcoverwidth \pdfpageheight=210mm
+	\setlrmarginsandblock{0cm}{0cm}{*}
+	\setulmarginsandblock{0cm}{0cm}{*}
+%	\setlength{\hoffset}{-1in}\setlength{\voffset}{-1in}
+	\setlength{\headsep}{0pt}\setlength{\headheight}{0pt}\setlength{\footskip}{-8pt}
+	\makeevenhead{abntheadings}{}{}{}\makeoddhead{abntheadings}{}{}{}\makeheadrule{abntheadings}{0pt}{0pt}
+	\begin{tikzpicture}[remember picture, overlay, every node/.style={inner sep=0pt}]
+		\fill[black] (current page.north west) coordinate (origin) rectangle ++(\hardcoverwidth,-1.5cm) coordinate (bg north east);
+		\fill[background color] (current page.north west) ++(0,-1.5cm) rectangle ++(\hardcoverwidth,1.5cm+2.5cm-21cm);
+		\fill[black] (current page.south west) rectangle ++(\hardcoverwidth,2.5cm) coordinate (bg south east);
+		%-ABA DA CAPA
+		\node[font=\sffamily\fontsize{9}{10}\selectfont,white,text width=3.5cm,below left=2cm and 0.5cm of bg north east] {\titleflap@hardcover@UFSC};
+		%-CAPA
+		\node[font=\sffamily\fontsize{17}{19}\selectfont,white,left=5.5cm of bg north east, yshift=1.5cm/2, align=right] {\upperbar@hardcover@UFSC};
+		\node[font=\sffamily\fontsize{13}{14}\selectfont,white, text width=8cm, align=right, left=5.5cm of bg south east, yshift=-2.5cm/2]	 {\lowerbar@hardcover@UFSC};
+		\node[font=\sffamily\fontsize{14}{16}\selectfont,white,text width=14cm,align=center] at ([xshift=-5cm-15cm/2]$(bg north east)!.5!(bg south east)$) {\title@hardcover@UFSC};
+		\node[right=1cm] at ($(current page.south west)+(4.5cm+14.8cm+\X@UFSC,2.5cm/2)$) {\includegraphics[height=1.5cm]{ufsc-logo-hardcover}};
+		%-LOMBADA
+		\node[font=\sffamily, white] at ($(current page.north west)+(4.5cm+14.8cm+\X@UFSC/2,-1.5cm+0.2cm)$) {\resizebox{.9\X@UFSC}{!}{\imprimirdata}};
+		\node[font=\sffamily, rotate=-90, white,align=center] at ($(bg north east)!.5!(bg south east)+(-5cm-15cm-\X@UFSC/2,0)$) {\resizebox{!}{.9\X@UFSC}{\begin{tabular}{@{}c@{}}
+				\imprimirtitulo\\\imprimirautor
+				\end{tabular}}};
+		%-CONTRA-CAPA
+		\node[font=\sffamily\fontsize{14}{15}\selectfont,white,text width=13.5cm,align=center] at ([xshift=-5cm-15cm-\X@UFSC-14.8cm/2]$(bg north east)!.5!(bg south east)$) {\countertitle@hardcover@UFSC};
+		\node[font=\sffamily\fontsize{14}{15}\selectfont,white,text width=14cm,align=center] at ([shift={(-5cm-15cm-\X@UFSC-14.8cm/2,3cm)}]bg south east) {\imprimirlocal, \imprimirdata};
+		%-ABA DA CONTRA-CAPA
+		\node[font=\sffamily\fontsize{9}{10}\selectfont,white,text width=3.5cm,below right=3.5cm and 0.5cm of current page.north west] {\countertitleflap@hardcover@UFSC};
+	\end{tikzpicture}
+}
+\let\imprimircapaoriginal\imprimircapa
+\renewcommand{\imprimircapa}{\@ifstar{\imprimircapaversaodura}{\imprimircapaoriginal}}
+\newcommand{\imprimircapaversaodura}{%
+	\hypersetup{pageanchor=false}
+\begin{capa}
+	\begin{tikzpicture}[remember picture, overlay, every node/.style={inner sep=0pt}]
+	\fill[black] (current page.north west) rectangle ([yshift=-1.5cm]current page.north east) coordinate (bg north east);
+	\fill[black] (current page.south west) coordinate (origin) rectangle ([yshift=2.5cm]current page.south east) coordinate (bg south east);
+	\fill[background color] (bg north east) rectangle (bg south east-|origin) coordinate[pos=.5](center);
+	%-CAPA
+	\node[font=\sffamily\fontsize{17}{19}\selectfont,white,left=0.5cm of bg north east, yshift=1.5cm/2, align=right] {\upperbar@hardcover@UFSC};
+	\node[font=\sffamily\fontsize{13}{14}\selectfont,white, text width=12cm, align=right, left=0.5cm of bg south east, yshift=-2.5cm/2]	 {\lowerbar@hardcover@UFSC};
+	\node[font=\sffamily\fontsize{14}{16}\selectfont,white,text width=14cm,align=center] at (center) {\title@hardcover@UFSC};
+	\node[right=1cm, yshift=2.5cm/2] at (origin) {\includegraphics[height=1.5cm]{ufsc-logo-hardcover}};
+	\end{tikzpicture}
+\end{capa}
+\hypersetup{pageanchor=true}
+}
+
+%-EXTRAS
+%% Auxílio para fazer sub e sobre-escrito em fonte não matemática (upright) -> Ao invés de escrever X_{\text{sub}} escrever: X_[sub]
+\RequirePackage{mathtools}
+
+\def\easyupright@UFSC#1#2{%
+	\def\sb@text#1##1#2{\sb{\textnormal{##1}}}
+	\def\sp@text#1##1#2{\sp{\textnormal{##1}}}
+	\begingroup\lccode`\~=`\_\lowercase{\endgroup
+		\def~}{\@ifnextchar#1\sb@text\sb}
+	\begingroup\lccode`\~=`\^\lowercase{\endgroup
+		\def~}{\@ifnextchar#1\sp@text\sp}}
+
+\setUFSCtemplate{%
+	make upright easy/.code 2 args={%
+		\easyupright@UFSC{#1}{#2}
+		\AtBeginDocument{\catcode`\_=12 \mathcode`\_="8000 \catcode`\^=12 \mathcode`\^="8000}%
+	}
+	,easy upright indices/.style args={with #1#2}{make upright easy={#1}{#2}}
+	,easy upright indices/.default={with []}
+}
+\endinput
