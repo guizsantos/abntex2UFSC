@@ -1,0 +1,92 @@
+\documentclass[10.5pt,a5paper,english,brazil]{abntex2}
+\usepackage{abntex2UFSC}
+
+\usepackage{%
+	calligra% Fonte caligráfica da epigrafe
+	,indentfirst% Coloca os primeiros parágrafos com indentação
+	,pgfplots% Para fazer plots dentro do LaTeX
+	,pgfplotstable% Para auxiliar o pgfplots na leitura de dados externos
+	,booktabs% Implementa comandos para deixar as tabelas mais bonitas (\toprule \midrule \cmidrule \bottomrule ...)
+	,graphicx% Para inserir imagens
+	,capt-of%Para legendas fora de floats
+	,amsmath%carrega diversas ferramentas para auxiliar na construção de equações
+	,multirow
+	,pdfpages
+	%	,enumitem%Para facilitar a customização de listas (já é carregado pelo abntex2)
+}
+\setUFSCtemplate{%
+	title=Condensação ascendente em tubos inclináveis,
+	subtitle=visualização e transferência de calor,
+	author=Júlio César Alves Ferreira,
+	date=\the\year,
+	local=Florianópolis,
+	advisor={Prof. Jader Riso Barbosa Jr., PH.D.},
+	%co-advisor=Eng. Ian Jackes,
+	coordinator=Prof. Jonny Carlos da Silva,
+	nature of work={
+		type=masters dissertation,
+		course={Curso de Graduação em Engenharia Mecânica},
+		given title=Mestre Engenheiro
+	},
+	catalogue record={./fig/ficha.pdf},
+	bench1={Prof. Antônio Barcelos, Ph.D.\\Universidade Federal de Santa Catarina},
+	bench2={Profª Carla Duarte, Dr.\\Universidade Federal do Amapá},
+	bench3={Msc. Eduardo Fagundes\\Universidade Federal do Paraná},
+	dedication={Dedico este trabalho à todos os meus familiares e amigos},
+	epigraph={[...] and there's a million things I haven't done\\but just you wait, just you wait...}{Lin-Manuel Miranda, 2015},
+	epigraph font=\calligra,
+	sign line width=4cm,
+	easy upright indices={with ()},% Faz os sub e super escritos do modo matemático ficarem com "\text{}" (fonte normal -- não matemática) quando envoltos por "()" (Ex: X_(sup)  seria o mesmo que escrever X_{\text{sup})
+	use glossaries,% Essa chave configura um formato para as listas de siglas e símbolos, permite usar a chave 'unit' quando definindo uma entrada do glossaries e já passa o comando \makeglossaries. Também cria os comandos \imprimirlistadesiglas \imprimirlistadesimbolosromanos \imprimirlistadesimbolosgregos e \imprimirlistadesiglasesimbolos (esse último é equivalente a mandar imprimir os três anteriores)
+	%Existe também a chave 'use nomencl' que faz configurações parecidas para quem quiser usar o nomencl ao invés do glossaries
+	hard cover={
+		cover flap text={Este trabalho consiste de um exemplo de documento formatado de acordo com as normativas da UFSC e da ABNT.\\[0.5cm] Orientador: Fulano de Tal},
+		lower bar text={Universidade Federal de Santa Catarina\\Programa de Pós-Graduação em Engenharia Mecânica},
+		counter cover flap text={Universidade Federal de Santa Catarina\\Programa de pós-graduação em Engenharia Mecânica\\ www.posmec.ufsc.br\\ Campus Universitário Trindade, Florianópolis -- SC}
+	}
+}
+
+\usepackage{%
+	glossaries
+	%	,siunitx% Para fazer unidades e processar números (já é carregado pela opção 'use glossaries')
+}
+\loadglsentries{./tex-files/simbolosdtb}%Carrega as entradas de glossário do arquivo
+\sisetup{%Configura a aparência dos números e unidades processados pelo siunitx
+	output-decimal-marker={,}%Coloca "," dos decimais
+	,round-mode=places%Arredonda todos os não inteiros pelo ponto decimal
+	,round-precision=2%Precisão do arredondamento 2 (casas decimais pois round-mode=places)
+	,detect-all%Faz com que os comandos de número e unidade respeitem as fontes (negrito, itálico, etc)
+	,range-phrase={\space a\space}%Texto que aparece com os comandos \numrange, SIrange...
+	,list-final-separator={\space e\space}%Separador final que aparece com os comandos \numlist, SIlist...
+}
+\usepgfplotslibrary{units}
+%Alterações no cabeçalho: no estilo padrão do abntex2 o número da página fica na margem externa (lado direito da página ímpar e esquerdo da par), nas páginas pares, na parte interna (lado direito), aparece o texto 'Capítulo N. Título', e (finalmente) nas páginas ímpares aparece o título da seção.
+%Alteração proposta: colocar o número na margem interna, trocar o texto para a parte externa nas páginas ímpares (lado direito) e fazer o texto ser 'Cap. N: Título' em caixa alta (CAP. 1: TÍTULO), sem mais títulos da seçao.
+\makeoddhead{abntheadings}{\thepage}{}{\rightmark}
+\makeevenhead{abntheadings}{}{}{\thepage}
+\createmark{chapter}{both}{shownumber}{Cap.~}{:~}
+\clearmark{section}%remove os marcadores das seções
+\uppercaseheads%Coloca os cabeçalhos em maiúsculo
+
+%Ajustando os floats:
+\setfloatadjustment{table}{\centering\small} %Coloca todos os floats tipo table centralizados e com fonte pequena!
+\setfloatadjustment{figure}{\centering} %Coloca todos os floats tipo figure centralizados
+\setfloatlocations{table}{htb} %Configura os floats com os posicionadores htb (o padrão é tb, com o h agora os floats podem estar no meio do texto)
+\setfloatlocations{figure}{htb}
+
+\usepackage[alf,% estilo alfabético de bibliografia (para numérico: num)
+abnt-etal-cite=2,% em citações no texto de referências com múltiplos autores transforma os autores secundários em 'et al' caso eles excedam '2'
+abnt-etal-list=0,% em referências na listadas na BIBLIOGRAFIA de múltiplos autores NUNCA transforma os autores secundários em 'et al' (todos vão aparecer sempre)
+abnt-emphasize=bf% Troca o estilo de enfatização nas entradas da bibliografia para Bold Face (negrito)
+]{abntex2cite}% O abntex2cite deve ser, sempre, o último pacote a ser carregado (por razões de compatibilidade)
+
+
+
+\begin{document}
+	\imprimircapa% Versão de capa normal, para capa dura usar \imprimircapa*
+	\imprimirfolhaderosto
+	\imprimirfichacatalografica
+	%%Colocar a errata aqui (se tiver, é opcional)
+	\imprimirfolhadeaprovacao
+	\imprimirdedicatoria
+\end{document}
