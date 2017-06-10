@@ -1,0 +1,82 @@
+\documentclass[openright,draft]{memoir}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,brazil]{babel}
+\usepackage{minted,graphicx,fix-cm,multicol}
+\newmintinline[code]{latex}{}
+\newmint[displaycode]{latex}{}
+\newminted[coding]{latex}{}
+\newcommand*{\abntex}{abn\TeX2}
+\newcommand*{\abntexUFSC}{abn\TeX2UFSC}
+\newcommand{\emingles}[1]{\foreignlanguage{english}{\textit{#1}}}
+\title{\sffamily O pacote \abntexUFSC}
+\date{\today}
+\author{Guilherme Zanotelli dos Santos\and Júlio César Ferreira}
+\usepackage[hidelinks]{hyperref}
+\begin{document}
+\frontmatter
+\maketitle
+\begin{abstract}
+Fazer um documento acadêmico de alta qualidade e em conformidade com as normas ABNT e da Biblioteca Universitária (BU) da Universidade Federal de Santa Catarina (UFSC) pode ser um fardo pesado demais para uns, que muitas vezes optam por abrir mão de um desses quesitos para focar/cumprir o outro. Como forma de contribuição para a comunidade acadêmica da UFSC e extender o trabalho do Dr. Lauro Césa5r, criador da classe \abntex, foi criado o pacote \abntexUFSC\ que formata a classe \abntex\ segundo as normas da BU, de maneira simples e flexível, visando reduzir o tempo desprendido em formatação permitindo o autor focar apenas no conteúdo sem abrir mão da qualidade tipográfica do documento. Este manual descreve todas as funções do pacote.
+\end{abstract}
+\tableofcontents*
+\mainmatter
+\chapter{Introdução}
+De forma a facilitar a formatação da classe \abntex\ criou-se um único comando que através do sistema \texttt{\meta{chave}=\meta{valor}} é capaz de efetuar diversas tarefas, como ajustar o tamanho da fonte dos títulos de capítulo escrevendo \displaycode|chapter font size=\huge| em oposição ao que seria normalmente: \displaycode|\renewcommand{\ABNTEXchapterfontsize}{\huge}|
+
+Além disso, é fez-se comandos para criar a capa dura, a capa normal (não colorida), e uma capa para fazer um PDF versão e-book. Comandos para criar a folha de aprovação, folha de rosto e etc. Toda essa configuração do \emingles{template} é feita no preambulo, dentro do comando \displaycode|\setUFSCtemplate{chave = valor, chave = valor}|
+
+Entretanto, somente ao carregar o pacote diversas configurações já são automaticamente executadas, deixando o documento no estilo da BU, mas como algumas configurações são feitas pela classe devem ser passadas por ela.
+
+\section{O \texorpdfstring{\abntexUFSC}{abnTeX2UFSC} para os apressados}
+O pacote \abntexUFSC\ \textbf{deve ser} (obrigatoriamente) o \textbf{primeiro pacote} a ser carregado, Somente carrega-lo já garante o cumprimento com grande parte dos requisitos, restando apenas selecionar algumas opções da classe como \begin{enumerate}
+\item o tamanho do papel
+\item o tamanho da fonte
+\item línguas do documento (como se fossem opções do babel)
+\end{enumerate}
+
+Atualmente a tendência é que todos os documentos passem a ser em formato A5 (\code|a5paper|) e fonte tamanho 10.5pt (\code|10.5pt|)\footnote{Esse tamanho não é usual do \LaTeX, ele foi criado pelos autores do pacote, portanto passar um valor arbitrário não funcionará, veja \autoref{fonte-qualquer} para saber como selecionar fontes de tamanhos qualquer}. Sendo assim, um típico preâmbulo para teses seria:
+
+\begin{coding}
+\documentclass[a5paper,10.5pt,english,brazil]{abntex2}
+\usepackage{abntex2UFSC}
+
+\setUFSCtemplate{%
+	author   = {Nome Do Autor},
+	title    = {Título do trabalho},
+	subtitle = {Subtítulo},
+	date     = {\thebook\year},
+	local    = {Florianópolis}
+}
+
+\begin{document}
+	\imprimircapa
+	...
+\end{coding}
+
+O \abntexUFSC\ carrega os pacotes relevantes para a codificação do documento de acordo com o compilador usado, ou seja, caso compile-se usando \texttt{pdflatex} os pacotes \texttt{inputenc} e \texttt{fontenc} são carregados, e caso o \texttt{xelatex} seja usado, o \texttt{fontspec} é carregado, não sendo necessário carregar nenhum desses pacotes.
+
+Outros pacotes carregados pelo \abntexUFSC:
+\begin{multicols}{3}
+\begin{itemize}
+\item pgfkeys \item pdfpages \item varwidth \item fix-cm \item tikz \item geometry
+\item xcolor \item indentfirst\item booktabs \item afterpackage \item calc \item mathtools
+\end{itemize}
+\end{multicols}
+
+\chapter{Configurando o \textit{template}}
+\section{Formatando títulos}
+\section{Informações de capa}
+\section{Fugindo da norma}
+
+\chapter{Comandos do pacote}
+\section{Gerando os elementos pré-textuais}
+\section{title}
+\chapter{Dicas e boas práticas}
+\section{Organização}
+\section{Compiladores}
+\subsubsection{-shell-escape}
+\subsection{Bibliografia}
+\subsection{Lista de siglas -- \texttt{glossaries}}
+\section{Números e unidades}
+\end{document}
