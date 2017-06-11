@@ -279,7 +279,9 @@
 	}
 	,catalogue record/.code={\usepackage{pdfpages}\def\imprimirfichacatalografica{\includepdf{#1}}}
 	,sign line width/.code={\setlength{\ABNTEXsignwidth}{#1}}
-	,sign line width=6cm%
+	,sign skip/.code={\setlength{\ABNTEXsignskip}{#1}}
+	,sign line thickness/.code={\setlength{\ABNTEXsignthickness}{#1}}
+	,sign line width=6cm, sign skip=0.75cm, sign line thickness=1pt%
 	,approval sheet code/.code={\def\imprimirfolhadeaprovacao{#1}}
 	,approval sheet code={%
 		\begin{folhadeaprovacao}
@@ -538,11 +540,10 @@
 
 %-EXTRAS
 %% Auxílio para fazer sub e sobre-escrito em fonte não matemática (upright) -> Ao invés de escrever X_{\text{sub}} escrever: X_[sub]
-\RequirePackage{mathtools}
 
 \def\easyupright@UFSC#1#2{%
-	\def\sb@text#1##1#2{\sb{\textnormal{##1}}}
-	\def\sp@text#1##1#2{\sp{\textnormal{##1}}}
+	\def\sb@text#1##1#2{\sb{\textup{##1}}}
+	\def\sp@text#1##1#2{\sp{\textup{##1}}}
 	\begingroup\lccode`\~=`\_\lowercase{\endgroup
 		\def~}{\@ifnextchar#1\sb@text\sb}
 	\begingroup\lccode`\~=`\^\lowercase{\endgroup
@@ -556,4 +557,12 @@
 	,easy upright indices/.style args={with #1#2}{make upright easy={#1}{#2}}
 	,easy upright indices/.default={with []}
 }
+
+%% Coloca as citações do texto em caixa baixa - Somente para uso com abntex2cite
+
+\newcommand*{\lowercasecite}[1]{(\citeauthorinline{#1}, \citeyear{#1})}
+\setUFSCtemplate{%
+	lowercased citations/.code={\let\cite\lowercasecite}
+}
+
 \endinput

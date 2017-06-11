@@ -1,19 +1,41 @@
-\documentclass[openright,draft]{memoir}
+\documentclass[openright]{memoir}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english,brazil]{babel}
-\usepackage{minted,graphicx,fix-cm,multicol}
+\usepackage{minted,graphicx,multicol,xcolor,indentfirst,enumitem}
+% Minted settings
+\definecolor{codingbg}{rgb}{0.95,0.95,0.95}
+\setminted{escapeinside=!!}
 \newmintinline[code]{latex}{}
 \newmint[displaycode]{latex}{}
-\newminted[coding]{latex}{}
+\newminted[coding]{latex}{bgcolor=codingbg}
+\makeatletter
+\patchcmd{\minted@colorbg}{\noindent}{\medskip\noindent}{}{}
+\apptocmd{\endminted@colorbg}{\par\medskip}{}{}
+\makeatother
+
+% Enumitem settings
+\newlist{keys}{description}{3}
+\setlist[keys]{format=\bfseries\ttfamily}
+\newcommand{\key}[2][nenhum]{\item[#2] \hfill (padrão: \texttt{#1})\\}
+
+% Other settings
 \newcommand*{\abntex}{abn\TeX2}
 \newcommand*{\abntexUFSC}{abn\TeX2UFSC}
 \newcommand{\emingles}[1]{\foreignlanguage{english}{\textit{#1}}}
+
+% Title
 \title{\sffamily O pacote \abntexUFSC}
 \date{\today}
 \author{Guilherme Zanotelli dos Santos\and Júlio César Ferreira}
 \usepackage[hidelinks]{hyperref}
+\hypersetup{%
+	pdfcreator={LaTeX}
+	,pdfauthor={Guilherme Z. Santos and Júlio César Ferreira}
+	,pdftitle={O pacote abnTeX2UFSC}
+}
 \begin{document}
+\pagestyle{simple}
 \frontmatter
 \maketitle
 \begin{abstract}
@@ -59,19 +81,85 @@ O \abntexUFSC\ carrega os pacotes relevantes para a codificação do documento d
 Outros pacotes carregados pelo \abntexUFSC:
 \begin{multicols}{3}
 \begin{itemize}
-\item pgfkeys \item pdfpages \item varwidth \item fix-cm \item tikz \item geometry
-\item xcolor \item indentfirst\item booktabs \item afterpackage \item calc \item mathtools
+\item pgfkeys \item pdfpages    \item varwidth \item fix-cm       \item tikz \item geometry
+\item xcolor  \item indentfirst \item booktabs \item afterpackage \item calc
 \end{itemize}
 \end{multicols}
 
 \chapter{Configurando o \textit{template}}
+Dentro do comando \code|\setUFSCtemplate| existem várias chaves que podem ser configuradas, neste capítulo trataremos de cada uma delas.
+
 \section{Formatando títulos}
-\section{Informações de capa}
+As chaves que fazem a formatação dos títulos são bastante intuitivas.
+
+\begin{keys}
+\key[\code|\normalfont\bfseries|]{part font} Configura o estilo da fonte das partes
+\key[\code|\normalfont\bfseries|]{chapter font} Configura o estilo da fonte dos capítulos
+\key[\code|\normalfont|]{section font} Configura o estilo da fonte das seções
+\key[\code|\normalfont\bfseries|]{subsection font} Configura o estilo da fonte das subseções
+\key[\code|\normalfont|]{subsubsection font} Configura o estilo da fonte das subsubseções
+\key[\code|\normalfont\itshape|]{subsubsubsection font} Configura o estilo da fonte das subsubsubseções
+\key[\code|\normalfont\bfseries|]{part font size} Configura o tamanho da fonte das partes
+\key[\code|\normalsize|]{chapter font size} Configura o tamanho da fonte dos capítulos
+\key[\code|\normalsize|]{section font size} Configura o tamanho da fonte das seções
+\key[\code|\normalsize|]{subsection font size} Configura o tamanho da fonte das subseções
+\key[\code|\normalsize|]{subsubsection font size} Configura o tamanho da fonte das subsubseções
+\key[\code|\normalsize|]{subsubsubsection font size} Configura o tamanho da fonte das subsubsubseções
+\key[-]{uppercased chapters} Coloca os capítulos em caixa alta, como trata-se de um estilo ele não recebe argumento
+\key[-]{uppercased sections} Coloca as seções em caixa alta
+\key[-]{uppercased subsections} Coloca as subseções em caixa alta
+\key[-]{uppercased subsubsections} Coloca as subsubseções em caixa alta
+\key[-]{uppercased subsubsubsection} Coloca as subsubsubseções em caixa alta
+\key[\code|\normalsize|]{titles font size} Coloca todos os títulos (desde \texttt{part} à \texttt{subsubsubsection}) no mesmo tamanho de fonte
+\end{keys}
+
+\subsubsection{Fontes de qualquer tamanho}
+\label{fonte-qualquer}
+
+Para configurar uma fonte em um tamanho arbitrário, primeiramente deve-se saber se essa fonte suporta o tamanho requisitado, no caso de fontes escaláveis (True Type, por exemplo) qualquer tamanho é suportado, mas algumas fontes mais antigas, como a fonte nativa do \LaTeX\ (\emph{Computer Modern Roman}) não são escaláveis e acabam ficando ``feias'' quando colocadas em tamanhos que não foram configuradas. Felizmente o pacote \texttt{fix-cm} corrige os problemas com a fonte nativa do \LaTeX permitindo que escolhamos qualquer tamanho de fonte.
+
+Para selecionar um tamanho qualquer usa-se o comando \displaycode|\fontesize!\marg{size}\marg{skip}!\selectfont| Onde \meta{size} é o tamanho da fonte (em pt) e \meta{skip} é o \emingles{baseline skip} (a distância entre linhas, usualmente adota-se um valor de 1,2 vezes o tamanho da fonte). O comando \code|\selectfont| serve para selecionar o tamanho de fonte escolhido. Aplicando-se à maneira como o \abntexUFSC\ funciona: \displaycode|chapter font size={\fontsize{16pt}{19.2pt}\selectfont}|
+\section{Informações de capa e afins}
+Vários dos elementos pré-textuais podem ser automaticamente gerados desde que tenham sido fornecidas as informações adequadas. Por exemplo, a capa necessita das seguintes informações: nome do autor, título do trabalho, data e local. As chaves que guardam essas informações são:
+
+\begin{keys}
+\key{author} Guarda o autor do trabalho (para múltiplos autores usar \code|\and| ou \code|\\|).
+\key{title} Guarda o título do trabalho.
+\key{subtitle} Guarda o subtítulo do trabalho.
+\key{date} Guarda a data (pode ser só o ano como \code|\the\year|)
+\key{local} Guarda o local onde o trabalho foi realizado.
+\key[Universidade Federal de Santa Catarina]{institution} Guarda a instituição em que o trabalho foi realizado.
+\key{advisor} Guarda o orientador.
+\key{co-advisor} Guarda o co-orientador.
+\key{coordinator} Guarda o coordenador do programa (no caso de TCC é o professor da disciplina)
+\key[-]{nature of work} Configura a natureza do trabalho, e gera automaticamente o texto da folha de rosto e da folha de aprovação com as informações que são dadas. Aqui são válidas as seguintes chaves:
+	\begin{keys}
+	\key{type} Pode assumir os valores: \texttt{tcc}, \texttt{monography}, \texttt{masters dissertation}, \texttt{doctoral thesis} e \texttt{post-doc report}. Configura automaticamente o texto do tipo de trabalho e a cor da capa segundo o requisitado pela BU.
+	\key{course} Guarda o nome do curso/programa responsável pela formação acadêmica.
+	\key{given title} Guarda o nome do título recebido pela conclusão do trabalho desenvolvido.
+	\end{keys}
+\key{nature of work text} Guarda o texto colocado na folha de rosto, caso o texto padrão gerado pelas informações dadas em \texttt{nature of work} não satisfaça pode-se sobrescreve-lo.
+\key[none]{approval sheet text} Guarda o texto que deve ser usado na folha de aprovação, por padrão caso o texto seja \texttt{none} usa-se um texto padrão.
+\key{bench N} Guarda o nome do membro da banca, \texttt{N} pode ser um número inteiro de \texttt{1} a \texttt{4}. Para mais membros de banca veja o \autoref{customização}.
+\key[6cm]{sign line width} Configura a largura da linha de assinatura.
+\key[1pt]{sign line thickness} Configura a espessura da linha de assinatura.
+\key[0.75cm]{sign skip} Configura a distância entre a linha de assinatura e o nome.
+\end{keys}
+
+
+
 \section{Fugindo da norma}
 
 \chapter{Comandos do pacote}
 \section{Gerando os elementos pré-textuais}
-\section{title}
+
+
+\chapter{Alterando os padrões}
+\label{customização}
+\section{Capa}
+\section{Folha de rosto}
+
+
 \chapter{Dicas e boas práticas}
 \section{Organização}
 \section{Compiladores}
