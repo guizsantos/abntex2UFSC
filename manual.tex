@@ -9,7 +9,7 @@
 \newmintinline[code]{latex}{}
 \newmint[displaycode]{latex}{}
 \newminted[coding]{latex}{bgcolor=codingbg}
-\makeatletter
+\makeatletter% minted fix for increasing separation between code blocks and text
 \patchcmd{\minted@colorbg}{\noindent}{\medskip\noindent}{}{}
 \apptocmd{\endminted@colorbg}{\par\medskip}{}{}
 \makeatother
@@ -113,6 +113,31 @@ As chaves que fazem a formatação dos títulos são bastante intuitivas.
 \key[\code|\normalsize|]{titles font size} Coloca todos os títulos (desde \texttt{part} à \texttt{subsubsubsection}) no mesmo tamanho de fonte
 \end{keys}
 
+Os estilos possíveis são quaisquer estilos de fonte, como por exemplo:
+\begin{itemize}
+\item \code|\rmfamily| coloca o texto em fonte Romana (com serifas);
+\item \code|\normalfont| coloca o texto em fonte ``normal'', usualmente é equivalente à \code|\rmfamily|;
+\item \code|\sffamily| coloca o texto em fonte \textsf{Sem serifa} (\textit{sans serif}), fonte tipo Arial;
+\item \code|\scshape| coloca o texto em fonte \textsc{Versalete};
+\item \code|\itshape| coloca o texto em fonte \textit{Italicizada}.
+\item \code|\bfseries| coloca o texto em fonte \textbf{Negrito}.
+\end{itemize}
+
+Os tamanhos de fonte, apesar de poderem ser configurados manualmente, é aconselhado que utilize-se dos padrões do \LaTeX:
+
+\begin{itemize}
+\item \code|\tiny| {\tiny muito pequeno};
+\item \code|\scriptsize| {\scriptsize tamanho de subscrito};
+\item \code|\footnotesize| {\footnotesize tamanho de nota de rodapé};
+\item \code|\small| {\small pequeno};
+\item \code|\normalsize| {\normalsize normal} (tamanho do documento);
+\item \code|\large| {\large um pouco maior};
+\item \code|\Large| {\Large maior};
+\item \code|\LARGE| {\LARGE bem maior};
+\item \code|\huge| {\huge enorme};
+\item \code|\Huge| {\Huge gigante};
+\end{itemize}
+
 \subsubsection{Fontes de qualquer tamanho}
 \label{fonte-qualquer}
 
@@ -132,7 +157,7 @@ Vários dos elementos pré-textuais podem ser automaticamente gerados desde que 
 \key{advisor} Guarda o orientador.
 \key{co-advisor} Guarda o co-orientador.
 \key{coordinator} Guarda o coordenador do programa (no caso de TCC é o professor da disciplina)
-\key[-]{nature of work} Configura a natureza do trabalho, e gera automaticamente o texto da folha de rosto e da folha de aprovação com as informações que são dadas. Aqui são válidas as seguintes chaves:
+\key[-]{nature of work} Configura a natureza do trabalho, e gera automaticamente o texto da folha de rosto e da folha de aprovação com as informações que são dadas. Aqui são válidas as seguintes chaves:\footnote{Essa chave é um tanto atípica com relação às outras, dentro dela são válidas outras chaves}
 	\begin{keys}
 	\key{type} Pode assumir os valores: \texttt{tcc}, \texttt{monography}, \texttt{masters dissertation}, \texttt{doctoral thesis} e \texttt{post-doc report}. Configura automaticamente o texto do tipo de trabalho e a cor da capa segundo o requisitado pela BU.
 	\key{course} Guarda o nome do curso/programa responsável pela formação acadêmica.
@@ -144,8 +169,16 @@ Vários dos elementos pré-textuais podem ser automaticamente gerados desde que 
 \key[6cm]{sign line width} Configura a largura da linha de assinatura.
 \key[1pt]{sign line thickness} Configura a espessura da linha de assinatura.
 \key[0.75cm]{sign skip} Configura a distância entre a linha de assinatura e o nome.
+\key{hard cover} Configura informações que serão utilizadas na confecção. Aqui são válidas as seguintes chaves:
+	\begin{keys}
+	\key[\code|\imprimirtitulo|]{cover text} 
+	\key[\code|\imprimirpreambulo\\2\baselineskip\imprimirorientadorRotulo:~\imprimirorientador|]{counter cover text} 
+	\key{cover flap text} 
+	\key{counter cover flap text}
+	\key{lower bar text}
+	\key[0.075]{X}
+	\end{keys}
 \end{keys}
-
 
 
 \section{Fugindo da norma}
