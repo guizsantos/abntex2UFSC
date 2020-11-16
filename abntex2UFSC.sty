@@ -1,3 +1,4 @@
+
 %% abntex2UFSC.sty, v-1 guizsantos
 %%
 %% This work may be distributed and/or modified under the
@@ -15,24 +16,29 @@
 %% This work consists of the file abntex2UFSC.sty.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{abntex2UFSC}[2017/03/01 abnTeX2 to UFSC]
+\RequirePackage{pgfkeys,pdfpages,varwidth,fix-cm,tikz,xcolor}
 
 \DeclareOption{a5paper}{%
-\setlrmarginsandblock{2.5cm}{1.5cm}{*}
-\setulmarginsandblock{2cm}{1.5cm}{*}
-\setlength{\headheight}{12.5pt}
-\checkandfixthelayout
+	\setlength{\baselineskip}{1cm}
+	\setlength{\parindent}{\baselineskip}
+	\setlength{\afterchapskip}{\baselineskip}
+	\setlrmarginsandblock{2.5cm}{1.5cm}{*}
+	\setulmarginsandblock{2cm}{1.5cm}{*}
+	\setheadfoot{\baselineskip}{\dimexpr\lowermargin-0.7cm\relax}
+	\setheaderspaces{0.7cm}{*}{*}
+	\checkandfixthelayout
 }
 
 \DeclareOption{10.5pt}{%
 \renewcommand\normalsize{%
 	\@setfontsize\normalsize{10.5}{12.5}}
 \renewcommand\small{%
-	\@setfontsize\small{9.5}{11.5}}
+	\@setfontsize\small{10}{12}}
 \renewcommand\footnotesize{%
-	\@setfontsize\small{8}{10}}
+	\@setfontsize\small{9.5}{11.5}}
 }
 
-\ProcessOptions\relax
+\ProcessOptions*
 
 \RequirePackage{iftex}%
 \ifPDFTeX%
@@ -42,11 +48,6 @@
 	\usepackage{fontspec}%
 \fi%
 
-\settypeoutlayoutunit{cm}
-\typeoutlayout
-
-\RequirePackage{pgfkeys,pdfpages,varwidth,fix-cm,tikz,xcolor,indentfirst}
-
 %-DEFINIÇÃO DE ALGUNS NOMES E SUAS TRADUÇÕES PARA O INGLÊS
 \renewcommand{\orientadorname}{Orientador}
 \renewcommand{\coorientadorname}{Coorientador}
@@ -54,6 +55,8 @@
 \newcommand{\listofacronymsandsymbolsname}{Lista de siglas e símbolos}
 \newcommand{\listofromansymbolsname}{Símbolos romanos}
 \newcommand{\listofgreeksymbolsname}{Símbolos gregos}
+\newcommand{\listofindicesname}{Sub e Super-índices}
+\newcommand{\listofcharnumbersname}{Números característicos}
 \newcommand{\listofacronymsname}{Siglas}
 \addto\captionsenglish{%
 	\renewcommand{\orientadorname}{Supervisor}
@@ -62,6 +65,8 @@
 	\renewcommand{\listofacronymsandsymbolsname}{List of acronyms and symbols}
 	\renewcommand{\listofromansymbolsname}{Roman symbols}
 	\renewcommand{\listofgreeksymbolsname}{Greek symbols}
+	\renewcommand{\listofindicesname}{Sub and Superindices}
+	\renewcommand{\listofcharnumbersname}{Characteristic numbers}
 	\renewcommand{\listofacronymsname}{Acronyms}
 }
 
@@ -101,6 +106,8 @@
 \setlength{\subfloatcapskip}{.5em}
 \setlength{\subfloatcaptopadj}{0pt}
 \addto\textual{\setcounter{table}{0}}
+\newlength{\dedicationwidth@UFSC}
+\newlength{\epigraphwidth@UFSC}
 
 %-CRIA O COMANDO PARA CONFIGURAR O TEMPLATE
 \newcommand{\setUFSCtemplate}[1]{\pgfkeys{/UFSC/.cd,#1}}
@@ -165,19 +172,20 @@
 	,advisor/.code={\orientador{#1}}
 	,co-advisor/.code={\coorientador{#1}}
 	,coordinator/.code={\def\imprimircoordenador{#1}}
-	,nature of work/.code={\pgfkeysalso{nature of work/.cd,#1,/UFSC/.cd, nature of work text={\typeofwork@UFSC\space\ifthenelse{\boolean{tcc}}{apresentado ao}{apresentada ao}\space\course@UFSC\space da Universidade Federal de Santa Catarina como parte dos requisitos para obtenção do título de\space\giventitle@UFSC.}}}
+	,nature of work/.code={\pgfkeysalso{nature of work/.cd,#1,/UFSC/.cd, nature of work text={\typeofwork@UFSC\space\ifthenelse{\boolean{tcc}}{apresentado ao}{submetida ao}\space\course@UFSC\space da \imprimirinstituicao\space como parte dos requisitos para obtenção do título de \giventitle@UFSC.}}}
 	,approval sheet text/.store in=\approvalsheet@UFSC
 	,approval sheet text={none}
-	,bench1/.code={\def\benchone@UFSC{\assinatura{#1}}}
-	,bench2/.code={\def\benchtwo@UFSC{\assinatura{#1}}}
-	,bench3/.code={\def\benchthree@UFSC{\assinatura{#1}}}
-	,bench4/.code={\def\benchfour@UFSC{\assinatura{#1}}}
+	,bench1/.code={\def\benchone@UFSC{#1}}
+	,bench2/.code={\def\benchtwo@UFSC{#1}}
+	,bench3/.code={\def\benchthree@UFSC{#1}}
+	,bench4/.code={\def\benchfour@UFSC{#1}}
 	,nature of work text/.code={\preambulo{#1}}
 	,nature of work/.cd%
 		,type/.is choice
 			,type/tcc/.code={%
 				\definecolor{background color}{cmyk}{0,1,1,0}%
-				\def\typeofwork@UFSC{Trabalho de Conclusão de Curso}%
+				\def\typeofwork@UFSC{Trabalho de Conclusão}%
+				\def\graduationlevel@UFSC{graduação}
 				\setboolean{tcc}{true}%
 				\let\upperbar@hardcover@UFSC\typeofwork@UFSC%
 			}
@@ -188,13 +196,15 @@
 			}
 			,type/masters dissertation/.code={%
 				\definecolor{background color}{cmyk}{1,0,1,0}
-				\def\typeofwork@UFSC{Dissertação de Mestrado}%
+				\def\typeofwork@UFSC{Dissertação de mestrado}%
+				\def\graduationlevel@UFSC{mestrado}
 				\setboolean{tcc}{false}%
 				\let\upperbar@hardcover@UFSC\typeofwork@UFSC%
 			}
 			,type/doctoral thesis/.code={%
 				\definecolor{background color}{cmyk}{1,.69,0,0}%
-				\def\typeofwork@UFSC{Tese de Doutorado}%
+				\def\typeofwork@UFSC{Tese de doutorado}%
+				\def\graduationlevel@UFSC{doutorado}
 				\setboolean{tcc}{false}%
 				\let\upperbar@hardcover@UFSC\typeofwork@UFSC%
 			}
@@ -202,8 +212,10 @@
 				\definecolor{background color}{cmyk}{0,0,0,.6}%
 				\setboolean{tcc}{false}%
 				\def\upperbar@hardcover@UFSC{Relatório de Pós-doutorado}%
+				\def\graduationlevel@UFSC{pós-doutorado}
 			}
 		,course/.store in=\course@UFSC%
+		,center/.store in=\center@UFSC%
 		,given title/.store in=\giventitle@UFSC
 }
 
@@ -226,16 +238,20 @@
 	,cover page code={% Capa
 		\hypersetup{pageanchor=false}
 		\begin{capa}%
-			\center
+			\centering
+			\includegraphics{ufsc}\par
 			{
-%				\abntex@ifnotempty{\imprimirinstituicao}{\ABNTEXsectionfontsize\ABNTEXsectionfont\MakeTextUppercase{\imprimirinstituicao}\par}
+				\ABNTEXsectionfontsize\ABNTEXsectionfont\MakeTextUppercase{\imprimirinstituicao\protect\\\center@UFSC\protect\\\course@UFSC}\par
+				\vfill
 				\imprimirautor
 			}
 			
 			\vfill
-			\begin{center}
-			\ABNTEXchapterfontsize\ABNTEXchapterfont\MakeTextUppercase{\imprimirtitulo}\abntex@ifnotempty{\imprimirsubtitulo}{:\space\MakeTextUppercase\imprimirsubtitulo}
-			\end{center}
+			
+			{
+				\ABNTEXchapterfontsize\ABNTEXchapterfont\MakeTextUppercase{\imprimirtitulo}\abntex@ifnotempty{\imprimirsubtitulo}{:\space\MakeTextUppercase\imprimirsubtitulo}
+			}
+			
 			\vfill
 			
 			\ABNTEXsectionfontsize\imprimirlocal
@@ -279,45 +295,42 @@
 	}
 	,catalogue record/.code={\usepackage{pdfpages}\def\imprimirfichacatalografica{\includepdf{#1}}}
 	,sign line width/.code={\setlength{\ABNTEXsignwidth}{#1}}
-	,sign skip/.code={\setlength{\ABNTEXsignskip}{#1}}
-	,sign line thickness/.code={\setlength{\ABNTEXsignthickness}{#1}}
-	,sign line width=6cm, sign skip=0.75cm, sign line thickness=1pt%
+	,sign line width=6.5cm%
+	,sign line skip/.code={\setlength{\ABNTEXsignskip}{#1}}
+	,sign line skip=2cm%
 	,approval sheet code/.code={\def\imprimirfolhadeaprovacao{#1}}
 	,approval sheet code={%
 		\begin{folhadeaprovacao}
 			\begin{center}
 				{\ABNTEXsectionfont\imprimirautor}
-				\vspace*{\fill}
+				\vfill
 				
 				{\ABNTEXchapterfont\ABNTEXchapterfontsize\MakeTextUppercase{\imprimirtitulo}\abntex@ifnotempty{\imprimirsubtitulo}{:\space\MakeTextUppercase\imprimirsubtitulo}}
-			\vfill
-		
-			\ifthenelse{\equal{\approvalsheet@UFSC}{none}}{%
-				\parbox{\textwidth}{\noindent\ifthenelse{\boolean{tcc}}{Este}{Esta}\space\typeofwork@UFSC\space foi\space\ifthenelse{\boolean{tcc}}{julgado adequado}{julgada adequada}\space para a obtenção do Título de \giventitle@UFSC, e\space\ifthenelse{\boolean{tcc}}{aprovado}{aprovada}\space em sua forma final pelo\space\course@UFSC\space da Universidade Federal de Santa Catarina.}}%
-				{\parbox{\textwidth}{\noindent\approvalsheet@UFSC}}
-			
-				\imprimirlocal, \imprimirdata.
+				\vfill
 				
-				\assinatura*{\imprimircoordenador\\Coordenador do curso}\hfill%
-				\ifthenelse{\boolean{tcc}}{\assinatura*{\imprimirprofessor\\Professor da disciplina}}{\assinatura*{\imprimirorientador\\\imprimirorientadorRotulo\\Presidente da banca}}
+				O presente trabalho em nível de \graduationlevel@UFSC\space foi avaliado e aprovado por banca examinadora composta pelos seguintes membros:\vspace{2\baselineskip}
 				
-			\textbf{\examinationbenchname}\hspace*{\fill}
-			
-				\ifdefined\benchone@UFSC\benchone@UFSC\else\fi
-				\ifdefined\benchtwo@UFSC\benchtwo@UFSC\else\fi
-				\ifdefined\benchthree@UFSC\benchthree@UFSC\else\fi
-				\ifdefined\benchfour@UFSC\benchfour@UFSC\else\fi
+				\ifdefined\benchone@UFSC\benchone@UFSC\vspace{2\baselineskip}\else\fi
+				\ifdefined\benchtwo@UFSC\benchtwo@UFSC\vspace{2\baselineskip}\else\fi
+				\ifdefined\benchthree@UFSC\benchthree@UFSC\vspace{2\baselineskip}\else\fi
+				\ifdefined\benchfour@UFSC\benchfour@UFSC\vspace{2\baselineskip}\else\fi
+				
+				\parbox{\textwidth}{Certificamos que esta é a \textbf{versão original e final} do trabalho de conclusão que foi julgado adequado para obtenção do título de \giventitle@UFSC.}		
+				
+				\assinatura{\imprimircoordenador\\Coordenador do \course@UFSC}%
+				\assinatura{\imprimirorientador\\\imprimirorientadorRotulo\\Presidente da banca}
 			\end{center}
 			\vfill
 		\end{folhadeaprovacao}
 	}
 	,dedication font/.store in=\dedicationfont@UFSC
 	,dedication font=\itshape
+	,dedication width/.code = {\setlength{\dedicationwidth@UFSC}{#1}}%
 	,dedication/.code={\def\imprimirdedicatoria{%
 		\begin{dedicatoria}
 			\vspace*{\fill}
 			\hfill
-			\begin{varwidth}{.5\textwidth}
+			\begin{varwidth}{\dedicationwidth@UFSC}
 				\dedicationfont@UFSC #1
 			\end{varwidth}
 		\end{dedicatoria}
@@ -325,11 +338,12 @@
 	}	
 	,epigraph font/.store in=\epigrafefont@UFSC
 	,epigraph font=\itshape
+	,epigraph width/.code = {\setlength{\epigraphwidth@UFSC}{#1}}
 	,epigraph/.code 2 args={\def\imprimirepigrafe{%
 		\begin{epigrafe}
 			\vspace*{\fill}
 			\hfill
-			\begin{minipage}{\textwidth-4cm}
+			\begin{minipage}{\epigraphwidth@UFSC}
 				\begingroup\epigrafefont@UFSC ``#1'' \endgroup
 				
 				\hfill (#2)
@@ -342,9 +356,12 @@
 %-SUPORTE PARA A LISTA DE SIGLAS
 \RequirePackage{afterpackage,calc}
 \AfterPackage{glossaries}{%
-	\newglossary[slg]{romansymbol}{sri}{srg}{\listofromansymbolsname} % create add. romansymbol
+	\newglossary[slr]{romansymbol}{sri}{srg}{\listofromansymbolsname} % create add. romansymbol
 	\newglossary[slg]{greeksymbol}{sgi}{sgg}{\listofgreeksymbolsname} % create add. greeksymbol
+	\newglossary[sli]{indices}{sii}{sig}{\listofindicesname} % create add. indices
+	\newglossary[sln]{numbers}{sni}{sng}{\listofcharnumbersname} % create add. indices
 	\glsaddkey*{unit}{}{\glsentryunit}{\Glsentryunit}{\glsunit}{\Glsunit}{\GLSunit}
+	\glsaddkey*{definition}{}{\glsentrydefinition}{\Glsentrydefinition}{\glsdefinition}{\Glsdefinition}{\GLSdefinition}
 	\newglossarystyle{siglas}{%
 		\setglossarystyle{long}%
 		\renewenvironment{theglossary}%
@@ -354,7 +371,7 @@
 	\newglossarystyle{simbolos}{%
 		\setglossarystyle{long3col}% base this style on the list style
 		\renewenvironment{theglossary}% Change the table type --> 3 columns
-		{\begin{longtable}{cp{.6\textwidth}c}}%
+		{\begin{longtable}{cp{.55\textwidth}c}}%
 		{\end{longtable}}%
 		\renewcommand*{\glossaryheader}{%  Change the table header
 			\bfseries Símbolo & \bfseries Descrição & \bfseries Unidade \\[.2em]
@@ -362,8 +379,30 @@
 		\renewcommand*{\glossentry}[2]{%  Change the displayed items
 			\glstarget{##1}{\glossentryname{##1}} & \glossentrydesc{##1} & \glsunit{##1}  \\}
 	}
+	\newglossarystyle{numbers}{%
+	\setglossarystyle{long3col}% base this style on the list style
+	\renewenvironment{theglossary}% Change the table type --> 3 columns
+	{\renewcommand*{\arraystretch}{2.5}\begin{longtable}{cp{.45\textwidth}c}}%
+		{\end{longtable}}%
+	\renewcommand*{\glossaryheader}{%  Change the table header
+		\bfseries Número & \bfseries Descrição & \bfseries Definição \\[\baselineskip]
+		\endhead}%
+	\renewcommand*{\glossentry}[2]{%  Change the displayed items
+		\glstarget{##1}{\glossentryname{##1}} & \glossentrydesc{##1} & \glsdefinition{##1}  \\}
+	}
+	\newglossarystyle{indices}{%
+	\setglossarystyle{long}% base this style on the list style
+	\renewenvironment{theglossary}% Change the table type --> 3 columns
+	{\begin{longtable}{lp{.8\textwidth}}}%
+		{\end{longtable}}%
+	\renewcommand*{\glossaryheader}{%  Change the table header
+		\bfseries Índice & \bfseries Descrição \\[.2em]
+		\endhead}%
+		\renewcommand*{\glossentry}[2]{%  Change the displayed items
+	( )\textsubscript{\glstarget{##1}{\glossentryname{##1}}} & \glossentrydesc{##1} \\}
+}
 	\glssetnoexpandfield{unit}
-	\makeglossaries
+	\glssetnoexpandfield{definition}
 }
 \setUFSCtemplate{use glossaries/.code={%
 		\let\printglossary\relax
@@ -469,7 +508,7 @@
 }
 
 %-DEFINIÇÕES PARA GERAR A CAPA DURA
-\RequirePackage{tikz,xcolor,geometry}
+\RequirePackage{tikz,xcolor}
 \usetikzlibrary{positioning,calc}
 
 \setUFSCtemplate{hard cover/.code={\pgfkeysalso{hard cover setup/.cd,#1,/UFSC/.cd}}
@@ -487,7 +526,7 @@
 \newlength{\hardcoverwidth}\newlength{\X@UFSC}
 \newcommand{\imprimircapadura}{%
 	\clearpage
-	\pgfmathparse{\thelastpage*\lombada@UFSC}
+	\pgfmathparse{\thelastpage*\lombada@UFSC/2}
 	\setlength{\X@UFSC}{\pgfmathresult mm}
 	\setlength{\hardcoverwidth}{4.5cm+14.8cm+\X@UFSC+15cm+5cm}
 	\eject \pdfpagewidth=\hardcoverwidth \pdfpageheight=210mm
@@ -540,10 +579,11 @@
 
 %-EXTRAS
 %% Auxílio para fazer sub e sobre-escrito em fonte não matemática (upright) -> Ao invés de escrever X_{\text{sub}} escrever: X_[sub]
+\RequirePackage{mathtools}
 
 \def\easyupright@UFSC#1#2{%
-	\def\sb@text#1##1#2{\sb{\textup{##1}}}
-	\def\sp@text#1##1#2{\sp{\textup{##1}}}
+	\def\sb@text#1##1#2{\sb{\textnormal{##1}}}
+	\def\sp@text#1##1#2{\sp{\textnormal{##1}}}
 	\begingroup\lccode`\~=`\_\lowercase{\endgroup
 		\def~}{\@ifnextchar#1\sb@text\sb}
 	\begingroup\lccode`\~=`\^\lowercase{\endgroup
@@ -557,18 +597,4 @@
 	,easy upright indices/.style args={with #1#2}{make upright easy={#1}{#2}}
 	,easy upright indices/.default={with []}
 }
-
-%% Coloca as citações do texto em caixa baixa - Somente para uso com abntex2cite
-
-\newcommand*{\lowercasecite}[1]{(\citeauthorinline{#1}, \citeyear{#1})}
-\setUFSCtemplate{%
-	lowercased citations/.code={\let\cite\lowercasecite}
-}
-\g@addto@macro\normalsize{%
-\setlength{\abovedisplayskip}{\lineskip}
-\setlength{\abovedisplayshortskip}{\lineskip}
-\setlength{\belowdisplayskip}{\lineskip}
-\setlength{\belowdisplayshortskip}{\lineskip}
-}
-
 \endinput

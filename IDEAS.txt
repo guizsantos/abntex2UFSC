@@ -1,0 +1,9 @@
+\usepackage{amsmath,lipsum,etoolbox}
+\usepackage[pagewise,displaymath]{lineno}
+\newcommand{\EncloseBylinenomath}[1]{%
+	\renewcommand*{\do}[1]{
+	\BeforeBeginEnvironment{##1}{\begin{linenomath}}
+	\AfterEndEnvironment{##1}{\end{linenomath}}}
+	\docsvlist{#1}}
+\EncloseBylinenomath{align,align*}
+\linenumbers

@@ -1,0 +1,13 @@
+pygtex
+aux
+toc
+log
+gz
+out
+*.pygtex
+*.pygstyle
+*.aux
+*.log
+*.out
+*.toc
+*.gz

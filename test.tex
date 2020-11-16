@@ -14,13 +14,14 @@
 	,pdfpages
 	%	,enumitem%Para facilitar a customização de listas (já é carregado pelo abntex2)
 }
+
 \setUFSCtemplate{%
-	title=Condensação ascendente em tubos inclináveis,
+	title=Simulação transiente de refrigeradores domésticos,
 	subtitle=visualização e transferência de calor,
-	author=Júlio César Alves Ferreira,
+	author=Guilherme,
 	date=\the\year,
 	local=Florianópolis,
-	advisor={Prof. Jader Riso Barbosa Jr., PH.D.},
+	advisor={Prof. Cláudio Melo., Ph.D.},
 	%co-advisor=Eng. Ian Jackes,
 	coordinator=Prof. Jonny Carlos da Silva,
 	nature of work={
@@ -28,12 +29,12 @@
 		course={Curso de Graduação em Engenharia Mecânica},
 		given title=Mestre Engenheiro
 	},
-	catalogue record={./fig/ficha.pdf},
+	catalogue record={./ficha.pdf},
 	bench1={Prof. Antônio Barcelos, Ph.D.\\Universidade Federal de Santa Catarina},
 	bench2={Profª Carla Duarte, Dr.\\Universidade Federal do Amapá},
 	bench3={Msc. Eduardo Fagundes\\Universidade Federal do Paraná},
 	dedication={Dedico este trabalho à todos os meus familiares e amigos},
-	epigraph={[...] and there's a million things I haven't done\\but just you wait, just you wait...}{Lin-Manuel Miranda, 2015},
+	epigraph={Do not go gentle into that good night}{Dylan Thomas, 1951. Em Interestellar 2014},
 	epigraph font=\calligra,
 	sign line width=4cm,
 	easy upright indices={with ()},% Faz os sub e super escritos do modo matemático ficarem com "\text{}" (fonte normal -- não matemática) quando envoltos por "()" (Ex: X_(sup)  seria o mesmo que escrever X_{\text{sup})
@@ -50,7 +51,7 @@
 	glossaries
 	%	,siunitx% Para fazer unidades e processar números (já é carregado pela opção 'use glossaries')
 }
-\loadglsentries{./tex-files/simbolosdtb}%Carrega as entradas de glossário do arquivo
+%\loadglsentries{./tex-files/simbolosdtb}%Carrega as entradas de glossário do arquivo
 \sisetup{%Configura a aparência dos números e unidades processados pelo siunitx
 	output-decimal-marker={,}%Coloca "," dos decimais
 	,round-mode=places%Arredonda todos os não inteiros pelo ponto decimal
@@ -89,4 +90,8 @@ abnt-emphasize=bf% Troca o estilo de enfatização nas entradas da bibliografia 
 	%%Colocar a errata aqui (se tiver, é opcional)
 	\imprimirfolhadeaprovacao
 	\imprimirdedicatoria
-\end{document}
+	\begin{agradecimentos}
+		Agradecimentos
+	\end{agradecimentos}
+	\imprimirepigrafe
+\end{document}}
