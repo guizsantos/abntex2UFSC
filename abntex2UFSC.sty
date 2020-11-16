@@ -215,8 +215,11 @@
 				\def\graduationlevel@UFSC{pós-doutorado}
 			}
 		,course/.store in=\course@UFSC%
+		,course={Curso de (Pós-)Graduação}
 		,center/.store in=\center@UFSC%
+		,center={Centro}
 		,given title/.store in=\giventitle@UFSC
+		,given title={Título recebido}
 }
 
 \hypersetup{
@@ -232,7 +235,8 @@
 
 %--DEFINIÇÕES PARA GERAÇÃO AUTOMÁTICA DE CAPA E OUTROS
 \setUFSCtemplate{%
-	cover page code/.code={%
+	nature of work={type=masters dissertation}
+	,cover page code/.code={%
 		\renewcommand{\imprimircapa}{#1}
 	}
 	,cover page code={% Capa
@@ -326,6 +330,7 @@
 	,dedication font/.store in=\dedicationfont@UFSC
 	,dedication font=\itshape
 	,dedication width/.code = {\setlength{\dedicationwidth@UFSC}{#1}}%
+	,dedication width=.7\textwidth
 	,dedication/.code={\def\imprimirdedicatoria{%
 		\begin{dedicatoria}
 			\vspace*{\fill}
@@ -339,6 +344,7 @@
 	,epigraph font/.store in=\epigrafefont@UFSC
 	,epigraph font=\itshape
 	,epigraph width/.code = {\setlength{\epigraphwidth@UFSC}{#1}}
+	,epigraph width=.55\textwidth
 	,epigraph/.code 2 args={\def\imprimirepigrafe{%
 		\begin{epigrafe}
 			\vspace*{\fill}
@@ -505,76 +511,6 @@
 	\captiondelim{\mbox{}}
 	\@makecaption{}{\ignorespaces\ABNTEXlegendfontsize #1}\par
 	\endgroup
-}
-
-%-DEFINIÇÕES PARA GERAR A CAPA DURA
-\RequirePackage{tikz,xcolor}
-\usetikzlibrary{positioning,calc}
-
-\setUFSCtemplate{hard cover/.code={\pgfkeysalso{hard cover setup/.cd,#1,/UFSC/.cd}}
-	,hard cover setup/.cd
-		,cover text/.store in=\title@hardcover@UFSC
-		,cover text={\imprimirtitulo\\[0.5cm]\imprimirautor}
-		,counter cover text/.store in=\countertitle@hardcover@UFSC
-		,counter cover text={\imprimirpreambulo\\[2\baselineskip]\imprimirorientadorRotulo:~\imprimirorientador}
-		,cover flap text/.store in=\titleflap@hardcover@UFSC
-		,counter cover flap text/.store in=\countertitleflap@hardcover@UFSC
-		,lower bar text/.store in=\lowerbar@hardcover@UFSC
-		,X/.store in=\lombada@UFSC
-		,X=0.075
-}
-\newlength{\hardcoverwidth}\newlength{\X@UFSC}
-\newcommand{\imprimircapadura}{%
-	\clearpage
-	\pgfmathparse{\thelastpage*\lombada@UFSC/2}
-	\setlength{\X@UFSC}{\pgfmathresult mm}
-	\setlength{\hardcoverwidth}{4.5cm+14.8cm+\X@UFSC+15cm+5cm}
-	\eject \pdfpagewidth=\hardcoverwidth \pdfpageheight=210mm
-	\setlrmarginsandblock{0cm}{0cm}{*}
-	\setulmarginsandblock{0cm}{0cm}{*}
-%	\setlength{\hoffset}{-1in}\setlength{\voffset}{-1in}
-	\setlength{\headsep}{0pt}\setlength{\headheight}{0pt}\setlength{\footskip}{-8pt}
-	\makeevenhead{abntheadings}{}{}{}\makeoddhead{abntheadings}{}{}{}\makeheadrule{abntheadings}{0pt}{0pt}
-	\begin{tikzpicture}[remember picture, overlay, every node/.style={inner sep=0pt}]
-		\fill[black] (current page.north west) coordinate (origin) rectangle ++(\hardcoverwidth,-1.5cm) coordinate (bg north east);
-		\fill[background color] (current page.north west) ++(0,-1.5cm) rectangle ++(\hardcoverwidth,1.5cm+2.5cm-21cm);
-		\fill[black] (current page.south west) rectangle ++(\hardcoverwidth,2.5cm) coordinate (bg south east);
-		%-ABA DA CAPA
-		\node[font=\sffamily\fontsize{9}{10}\selectfont,white,text width=3.5cm,below left=2cm and 0.5cm of bg north east] {\titleflap@hardcover@UFSC};
-		%-CAPA
-		\node[font=\sffamily\fontsize{17}{19}\selectfont,white,left=5.5cm of bg north east, yshift=1.5cm/2, align=right] {\upperbar@hardcover@UFSC};
-		\node[font=\sffamily\fontsize{13}{14}\selectfont,white, text width=8cm, align=right, left=5.5cm of bg south east, yshift=-2.5cm/2]	 {\lowerbar@hardcover@UFSC};
-		\node[font=\sffamily\fontsize{14}{16}\selectfont,white,text width=14cm,align=center] at ([xshift=-5cm-15cm/2]$(bg north east)!.5!(bg south east)$) {\title@hardcover@UFSC};
-		\node[right=1cm] at ($(current page.south west)+(4.5cm+14.8cm+\X@UFSC,2.5cm/2)$) {\includegraphics[height=1.5cm]{ufsc-logo-hardcover}};
-		%-LOMBADA
-		\node[font=\sffamily, white] at ($(current page.north west)+(4.5cm+14.8cm+\X@UFSC/2,-1.5cm+0.2cm)$) {\resizebox{.9\X@UFSC}{!}{\imprimirdata}};
-		\node[font=\sffamily, rotate=-90, white,align=center] at ($(bg north east)!.5!(bg south east)+(-5cm-15cm-\X@UFSC/2,0)$) {\resizebox{!}{.9\X@UFSC}{\begin{tabular}{@{}c@{}}
-				\imprimirtitulo\\\imprimirautor
-				\end{tabular}}};
-		%-CONTRA-CAPA
-		\node[font=\sffamily\fontsize{14}{15}\selectfont,white,text width=13.5cm,align=center] at ([xshift=-5cm-15cm-\X@UFSC-14.8cm/2]$(bg north east)!.5!(bg south east)$) {\countertitle@hardcover@UFSC};
-		\node[font=\sffamily\fontsize{14}{15}\selectfont,white,text width=14cm,align=center] at ([shift={(-5cm-15cm-\X@UFSC-14.8cm/2,3cm)}]bg south east) {\imprimirlocal, \imprimirdata};
-		%-ABA DA CONTRA-CAPA
-		\node[font=\sffamily\fontsize{9}{10}\selectfont,white,text width=3.5cm,below right=3.5cm and 0.5cm of current page.north west] {\countertitleflap@hardcover@UFSC};
-	\end{tikzpicture}
-}
-\let\imprimircapaoriginal\imprimircapa
-\renewcommand{\imprimircapa}{\@ifstar{\imprimircapaversaodura}{\imprimircapaoriginal}}
-\newcommand{\imprimircapaversaodura}{%
-	\hypersetup{pageanchor=false}
-\begin{capa}
-	\begin{tikzpicture}[remember picture, overlay, every node/.style={inner sep=0pt}]
-	\fill[black] (current page.north west) rectangle ([yshift=-1.5cm]current page.north east) coordinate (bg north east);
-	\fill[black] (current page.south west) coordinate (origin) rectangle ([yshift=2.5cm]current page.south east) coordinate (bg south east);
-	\fill[background color] (bg north east) rectangle (bg south east-|origin) coordinate[pos=.5](center);
-	%-CAPA
-	\node[font=\sffamily\fontsize{17}{19}\selectfont,white,left=0.5cm of bg north east, yshift=1.5cm/2, align=right] {\upperbar@hardcover@UFSC};
-	\node[font=\sffamily\fontsize{13}{14}\selectfont,white, text width=12cm, align=right, left=0.5cm of bg south east, yshift=-2.5cm/2]	 {\lowerbar@hardcover@UFSC};
-	\node[font=\sffamily\fontsize{14}{16}\selectfont,white,text width=14cm,align=center] at (center) {\title@hardcover@UFSC};
-	\node[right=1cm, yshift=2.5cm/2] at (origin) {\includegraphics[height=1.5cm]{ufsc-logo-hardcover}};
-	\end{tikzpicture}
-\end{capa}
-\hypersetup{pageanchor=true}
 }
 
 %-EXTRAS

@@ -1,22 +1,19 @@
-\documentclass[12pt,a4paper,english,brazil]{abntex2}
+\documentclass[12pt,a4paper,oneside,english,brazil]{abntex2}
 \usepackage{abntex2UFSC}
 
 \usepackage{%
 	calligra%       Fonte caligráfica da epigrafe
 	,indentfirst%   Coloca os primeiros parágrafos com indentação
-	,pgfplots%      Para fazer plots dentro do LaTeX
-	,pgfplotstable% Para auxiliar o pgfplots na leitura de dados externos
 	,booktabs%      Implementa comandos para deixar as tabelas mais bonitas (\toprule \midrule \cmidrule \bottomrule ...)
 	,graphicx%      Para inserir imagens
-	,capt-of%       Para legendas fora de floats
-	,amsmath%       Carrega diversas ferramentas para auxiliar na construção de equações
-	,multirow%      Para fazer células de tabela que atravessam várias linhas
-	,pdfpages%      Para incluir PDFs em meio ao documento (e.g. ficha catalográfica)
-	%,enumitem      Para facilitar a customização de listas (já é carregado pelo abntex2)
-}
+	,csquotes, lipsum}
 
-\usepackage[acronym,nomain,nogroupskip,nonumberlist,noredefwarn,section=subsection]{glossaries
-	%,siunitx% Para fazer unidades e processar números (já é carregado pela opção 'use glossaries')
+\usepackage[acronym,nomain,nogroupskip,nonumberlist,noredefwarn,section=subsection]{glossaries}
+\glsdisablehyper
+\glssanitizesorttrue
+\renewcommand{\glsprestandardsort}[3]{%
+	\glsfieldfetch{#3}{desc}{#1}%
+	\glsdosanitizesort
 }
 
 \setUFSCtemplate{%
@@ -43,34 +40,17 @@
 	sign line width=8cm,
 	sign line skip=0.75cm,
 	easy upright indices={with ()},% Faz os sub e super escritos do modo matemático ficarem com "\text{}" (fonte normal -- não matemática) quando envoltos por "()" (Ex: X_(sup)  seria o mesmo que escrever X_{\text{sup})
-	use glossaries,% Essa chave configura um formato para as listas de siglas e símbolos, permite usar a chave 'unit' quando definindo uma entrada do glossaries e já passa o comando \makeglossaries. Também cria os comandos \imprimirlistadesiglas \imprimirlistadesimbolosromanos \imprimirlistadesimbolosgregos e \imprimirlistadesiglasesimbolos (esse último é equivalente a mandar imprimir os três anteriores)
+%	use glossaries,% Essa chave configura um formato para as listas de siglas e símbolos, permite usar a chave 'unit' quando definindo uma entrada do glossaries e já passa o comando \makeglossaries. Também cria os comandos \imprimirlistadesiglas \imprimirlistadesimbolosromanos \imprimirlistadesimbolosgregos e \imprimirlistadesiglasesimbolos (esse último é equivalente a mandar imprimir os três anteriores)
 	%Existe também a chave 'use nomencl' que faz configurações parecidas para quem quiser usar o nomencl ao invés do glossaries
 }
 
-\newglossaryentry{perimeter}{type=greeksymbol,name={\ensuremath{P}},description={Perímetro},unit={\si{\meter}}}
-\newglossaryentry{diameter}{type=greeksymbol,name={\ensuremath{D}},description={Diâmetro},unit={\si{\meter}}}
+
+\newglossaryentry{perimeter}{type=romansymbol,name={\ensuremath{P}},description={Perímetro},unit={\si{\meter}}}
+\newglossaryentry{diameter}{type=romansymbol,name={\ensuremath{D}},description={Diâmetro},unit={\si{\meter}}}
 \newglossaryentry{pi}{type=greeksymbol,name={\ensuremath{\pi}},description={Razão \gls{perimeter}/\gls{diameter}},unit={-}}
 \newacronym[plural={EDOs},firstplural={equações diferenciais ordinárias (EDOs)},description={Equação Diferencial Ordinária}]{EDO}{EDO}{equação diferencial ordinária}
 \newglossaryentry{ambient}{type=indices,name={amb},description={Ambiente}}
 \newglossaryentry{prandtl}{type=numbers,name={Pr},description={Número de Prandtl},definition={$\dfrac{\nu c_p}{\rho}$}}
-
-\sisetup{%Configura a aparência dos números e unidades processados pelo siunitx
-	output-decimal-marker={,}%Coloca "," dos decimais
-	,round-mode=places%Arredonda todos os não inteiros pelo ponto decimal
-	,round-precision=2%Precisão do arredondamento 2 (casas decimais pois round-mode=places)
-	,detect-all%Faz com que os comandos de número e unidade respeitem as fontes (negrito, itálico, etc)
-	,range-phrase={\space a\space}%Texto que aparece com os comandos \numrange, SIrange...
-	,list-final-separator={\space e\space}%Separador final que aparece com os comandos \numlist, SIlist...
-}
-\usepgfplotslibrary{units}
-
-%Alterações no cabeçalho: no estilo padrão do abntex2 o número da página fica na margem externa (lado direito da página ímpar e esquerdo da par), nas páginas pares, na parte interna (lado direito), aparece o texto 'Capítulo N. Título', e (finalmente) nas páginas ímpares aparece o título da seção.
-%Alteração proposta: colocar o número na margem interna, trocar o texto para a parte externa nas páginas ímpares (lado direito) e fazer o texto ser 'Cap. N: Título' em caixa alta (CAP. 1: TÍTULO), sem mais títulos da seçao.
-\makeoddhead{abntheadings}{\thepage}{}{\rightmark}
-\makeevenhead{abntheadings}{}{}{\thepage}
-\createmark{chapter}{both}{shownumber}{Cap.~}{:~}
-\clearmark{section}%remove os marcadores das seções
-
 
 %Ajustando os floats:
 \setfloatadjustment{table}{\centering\small} %Coloca todos os floats tipo table centralizados e com fonte pequena!
@@ -109,27 +89,28 @@
 	\begin{resumo}
 		Resumo do trabalho de conclusão
 	\end{resumo}
-	\begin{abstract}
+	\begin{resumo}[Abstract]
 		Abstract of the present work
-	\end{abstract}
+	\end{resumo}
 
 	\pdfbookmark[0]{Nomenclatura/Lista de símbolos}{nom}
 	\chapter*{Nomenclatura/Lista de símbolos}
 	Lista de símbolos. Feita à mão ou via pacotes como o glossaries ou nomenclature. Nesse caso, feito com o glosssaries:
-	\let\oldsubsecfont\ABNTEXsubsectionfont
-	\renewcommand*{\ABNTEXsubsectionfont}{\scshape}
-	\pdfbookmark[1]{Siglas}{sig}
-	\printglossary[type=\acronymtype,style=siglas]
-	\pdfbookmark[1]{Símbolos romanos}{rom}
-	\printglossary[type=romansymbol,style=simbolos]
-	\pdfbookmark[1]{Símbolos gregos}{gre}
-	\printglossary[type=greeksymbol,style=simbolos]
-	\pdfbookmark[1]{Sub e superíndices}{ind}
-	\printglossary[type=indices,style=indices]
-	\pdfbookmark[1]{Números característicos}{num}
-	\printglossary[type=numbers,style=numbers]
+	
+	\printglossaries
+	
+%	\pdfbookmark[1]{Siglas}{sig}
+%	\printglossary[type=\acronymtype,style=siglas]
+%	\pdfbookmark[1]{Símbolos romanos}{rom}
+%	\printglossary[type=romansymbol,style=simbolos]
+%	\pdfbookmark[1]{Símbolos gregos}{gre}
+%	\printglossary[type=greeksymbol,style=simbolos]
+%	\pdfbookmark[1]{Sub e superíndices}{ind}
+%	\printglossary[type=indices,style=indices]
+%	\pdfbookmark[1]{Números característicos}{num}
+%	\printglossary[type=numbers,style=numbers]
 	\cleardoublepage
-	\let\ABNTEXsubsectionfont\oldsubsecfont
+
 	
 	\pdfbookmark[0]{\contentsname}{toc}
 	\tableofcontents*
@@ -138,13 +119,22 @@
 	\textual
 	
 	\chapter{Introdução}
-	Introdução do trabalho
+	Introdução do trabalho \cite{fox2010}. Como feito por \textcite{article}...
+	
+	O número \gls{pi}, é encontrado em \glspl{EDO}, e representa a razão entre o diâmetro, \gls{diameter}, e o perímetro ambiente ($\gls{perimeter}_{\gls{ambient}}$). Uma \gls{EDO} comum de ser encontrada dá origem ao número de Prandtl, \gls{prandtl}.
+	
+	\lipsum[1-8]
+	\nocite{*}
 	
 	\chapter{Desenvolvimento}
+	\lipsum[10]
 	\section{Sub}
+	\lipsum[11]
 	\subsection{Subsub}
+	\lipsum[12]
 	
 	\chapter{Conclusão}
+	\lipsum[13-16]
 	
 	\postextual
 	\printbibliography[title=\texorpdfstring{\MakeTextUppercase{\bibname}}{\bibname}]
